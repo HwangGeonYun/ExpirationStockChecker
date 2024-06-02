@@ -27,11 +27,7 @@ public class StockController {
         return stockModel.search_all();
     }
     //재고 하나만 가져오기(특정 재고를 클릭햇을 때 실행 되며, 코드를 통해서 찾는다.)
-    public Stock searchData(String CODE) throws SQLException {
-        Stock stock = stockModel.searchData(CODE);
 
-        return stock;
-    }
     //폐기를 출력하기 위한 함수. 이번 프젝의 꽃
     public LinkedList<Stock> searchExpiredDatas() throws SQLException {
         return stockModel.searchExpiredDatas();
@@ -39,6 +35,10 @@ public class StockController {
     //부분 이름을 가진 재고들 출력
     public LinkedList<Stock> searchDatasByName(String NAME) throws SQLException {
         return stockModel.searchDatasByName(NAME);
+    }
+
+    public LinkedList<Stock> searchDatasByCode(String CODE) throws SQLException {
+        return stockModel.searchDatasByCode(CODE);
     }
     //code말고 모든 것을바꿀 수 있음. 코드를 바꾸려면 delete한다음 새로 코드를 파라
     public void updateData(String CODE, String NAME, Timestamp SHORTESTEXPIRYDATE, boolean EXIST) throws SQLException {

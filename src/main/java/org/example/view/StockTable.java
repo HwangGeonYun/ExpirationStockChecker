@@ -3,10 +3,7 @@ package org.example.view;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -18,10 +15,14 @@ import org.example.controller.StockController;
 
 import java.sql.SQLException;
 import java.util.LinkedList;
+import java.util.Optional;
 
 public class StockTable extends Application {
     private StockController stockController = new StockController();
+    private StockAdd stockAdd;
+    private StockInformation stockInformation;
 
+    TableView stockTable;
     @Override
     public void start(Stage primaryStage) throws SQLException {
 
@@ -31,11 +32,13 @@ public class StockTable extends Application {
         TextField inputForSearchStock = new TextField();
         Button searchStockButton = new Button("search");
 
+
+
         inputBox.setHgrow(inputForSearchStock, Priority.ALWAYS);
         inputBox.setHgrow(searchStockButton, Priority.NEVER);
         inputBox.getChildren().addAll(inputForSearchStock, searchStockButton);
 
-        TableView stockTable = new TableView();
+        stockTable = new TableView();
 
         TableColumn<Stock, String> codeCol = new TableColumn<>("코드번호");
         TableColumn<Stock, String> nameCol = new TableColumn<>("이름");
@@ -76,53 +79,63 @@ public class StockTable extends Application {
         changeStockBox.getChildren().addAll(createStock, updateStock, deleteStock);
 
         BorderPane expiraryPane = new BorderPane();
-        expiraryPane.setRight(new Button("폐기 확인"));
 
-        //vBox.getChildren().add(inputBox);
-        //hBox.getChildren().add(new Button("Button 2"));
+        Button searchExpiredStock = new Button("폐기확인");
+        expiraryPane.setRight(searchExpiredStock);
 
-        // VBox Example
-//        VBox vBox = new VBox();
-//        vBox.getChildren().add(new Button("Button 3"));
-//        vBox.getChildren().add(new Button("Button 4"));
+        //event 모음
+        createStock.setOnAction(event ->{
+            try {
+                openStockInfo("create");
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
+        updateStock.setOnAction(event->{
+            try {
+                openStockInfo("update");
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
+        deleteStock.setOnAction(event->{
+            Stock stock = (Stock)stockTable.getSelectionModel().getSelectedItem();
+            if(stock != null){
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("상품 삭제");
+                alert.setHeaderText("현재 상품을 목록에서 없애시겠습니까?");
+                alert.setContentText("상품의 삭제는 부디 신중하게 결정해주시길 부탁드립니다.");
 
-        // BorderPane Example
+                Optional<ButtonType> result = alert.showAndWait();
 
+                if (result.isPresent() && result.get() == ButtonType.OK){
+                    try {
+                        stockController.deleteData(stock.getCode());
+                        inputStocksToTable(stockTable, searchStock(""));
 
-//        BorderPane borderPane = new BorderPane();
-//        borderPane.setTop(new Button("Top"));
-//        borderPane.setBottom(new Button("Bottom"));
-//        borderPane.setLeft(new Button("Left"));
-//        borderPane.setRight(new Button("Right"));
-//        borderPane.setCenter(new Button("Center"));
-//
-//        // GridPane Example
-//        GridPane gridPane = new GridPane();
-//        gridPane.add(new Button("Button 5"), 0, 0);
-//        gridPane.add(new Button("Button 6"), 1, 0);
-//        gridPane.add(new Button("Button 7"), 0, 1);
-//        gridPane.add(new Button("Button 8"), 1, 1);
-//
-//        // FlowPane Example
-//        FlowPane flowPane = new FlowPane();
-//        flowPane.getChildren().add(new Button("Button 9"));
-//        flowPane.getChildren().add(new Button("Button 10"));
-//
-//        // TilePane Example
-//        TilePane tilePane = new TilePane();
-//        tilePane.getChildren().add(new Button("Button 11"));
-//        tilePane.getChildren().add(new Button("Button 12"));
-//
-//        // AnchorPane Example
-//        AnchorPane anchorPane = new AnchorPane();
-//        Button button = new Button("Button 13");
-//        AnchorPane.setTopAnchor(button, 10.0);
-//        AnchorPane.setLeftAnchor(button, 10.0);
-//        anchorPane.getChildren().add(button);
-//
-//        // StackPane Example
-//        StackPane stackPane = new StackPane();
-//        stackPane.getChildren().add(new Button("Button 14"));
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+        });
+
+        searchStockButton.setOnAction(event->{
+            try {
+                inputStocksToTable(stockTable, searchStock(inputForSearchStock.getText()));
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        searchExpiredStock.setOnAction(event ->{
+            try {
+                inputStocksToTable(stockTable, searchExpiredStock());
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
 
         // Main layout (VBox) to hold all examples
         VBox mainLayout = new VBox(10);
@@ -135,13 +148,42 @@ public class StockTable extends Application {
         primaryStage.setWidth(475);
         primaryStage.setResizable(false);
         primaryStage.show();
+
+        primaryStage.setOnCloseRequest(event -> {
+            // 終了処理を行う
+            System.exit(0); // プログラムを終了させる
+        });
     }
-    //LinkedList는 ObservableList로 형변환 불과->FXCollections.observableList를 사용하자!
     private LinkedList<Stock> searchStock(String name) throws SQLException {
         return (name.isEmpty()) ? stockController.search_all() : stockController.searchDatasByName(name);
     }
+
+    private LinkedList<Stock> searchExpiredStock() throws SQLException {
+        return stockController.searchExpiredDatas();
+    }
+
+    //LinkedList는 ObservableList로 형변환 불과->FXCollections.observableList를 사용하자!
     private void inputStocksToTable(TableView<Stock> stockTable, LinkedList<Stock> stockList){
 
         stockTable.setItems(FXCollections.observableList(stockList));
     }
+
+     public void openStockInfo(String which) throws Exception {
+        switch(which) {
+            case "create": {
+                stockAdd = new StockAdd(stockController, stockTable);
+                stockAdd.start(new Stage());
+                break;
+            }
+            case "update": {
+                Stock stock = (Stock)stockTable.getSelectionModel().getSelectedItem();
+                if(stock != null) {
+                    stockInformation = new StockInformation(stock, stockController, stockTable);
+                    stockInformation.start(new Stage());
+                }
+            }
+        }
+     }
+
+
 }

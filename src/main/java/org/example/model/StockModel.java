@@ -2,14 +2,35 @@ package org.example.model;
 
 import org.example.Stock;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.sql.*;
 import java.util.LinkedList;
+import java.util.Properties;
 
 public class StockModel {
 
-    static final String JDBC_URL = "jdbc:mysql://localhost:3306/ConvenienceStoreStock";
-    static final String USERNAME = "root";
-    static final String PASSWORD = "Shwlsrn15!";
+    static final String JDBC_URL;
+    static final String USERNAME;
+    static final String PASSWORD;
+
+    static {
+        Properties properties = new Properties();
+        try (FileInputStream input = new FileInputStream("db.properties")) {
+            properties.load(input);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to load database properties.", e);
+        }
+        JDBC_URL = properties.getProperty("jdbc.url");
+        USERNAME = properties.getProperty("jdbc.username");
+        PASSWORD = properties.getProperty("jdbc.password");
+
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException("MySQL JDBC Driver not found.", e);
+        }
+    }
 
     Connection conn;
 
@@ -103,6 +124,32 @@ public class StockModel {
 
         return stockList;
     }
+
+    public LinkedList<Stock> searchDatasByCode(String CODE) throws SQLException {
+        String sql = "select * from stock where CODE like ?";
+        PreparedStatement statement = conn.prepareStatement(sql);
+        statement.setString(1, "%" + CODE + "%");
+        ResultSet resultSet = statement.executeQuery();
+
+        LinkedList<Stock> stockList = new LinkedList<Stock>();
+
+        while(resultSet.next()){
+            String code = resultSet.getString(1);
+            String name = resultSet.getString(2);
+            Timestamp shortestexpirydate = resultSet.getTimestamp(3);
+            boolean exist = resultSet.getBoolean(4);
+
+            Stock stock = new Stock(code, name, shortestexpirydate, exist);
+            stockList.add(stock);
+        }
+
+        for(Stock stocks : stockList){
+            System.out.println(stocks.toString());
+        }
+
+        return stockList;
+    }
+
     public LinkedList<Stock> searchExpiredDatas() throws SQLException {
         String sql = "select * from stock where SHORTESTEXPIRYDATE < NOW()";
         PreparedStatement statement = conn.prepareStatement(sql);
