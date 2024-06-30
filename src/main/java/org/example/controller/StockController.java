@@ -10,18 +10,17 @@ import java.util.LinkedList;
 public class StockController {
 
     private StockModel stockModel = new StockModel();
-
     //재고 추가하고
     public void addData(String CODE, String NAME, Timestamp SHORTESTEXPIRYDATE, boolean EXIST) throws SQLException {
         stockModel.addData(CODE, NAME, SHORTESTEXPIRYDATE, EXIST);
     }
     //전체 재고 가져오기(재고 표시용)
     public LinkedList<Stock> search_all() throws SQLException {
-        LinkedList<Stock> stocks = stockModel.search_all();
+        //LinkedList<Stock> stocks = stockModel.search_all();
 
-        for (Stock stock : stocks) {
+        /*for (Stock stock : stocks) {
             System.out.println(stock.toString());
-        }
+        }*/
         //test용
 
         return stockModel.search_all();
@@ -54,6 +53,8 @@ public class StockController {
             System.out.println(stock.toString());
         }
     }
-
-
+    public String getNextCode() throws SQLException {
+        //System.out.print(stockModel.getLastCode()+1);
+        return String.valueOf(stockModel.getLastCode()+1);
+    }
 }

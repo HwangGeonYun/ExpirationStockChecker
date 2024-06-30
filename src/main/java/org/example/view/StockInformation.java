@@ -34,9 +34,6 @@ public class StockInformation extends Application {
         LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-
-
-        //primaryStage = primaryStage;
         Label code = new Label("코드");
         Label name = new Label("이름");
         Label shortestexpirydate = new Label("근접유통기한 ");
@@ -98,8 +95,8 @@ public class StockInformation extends Application {
         mainLayout.add(nameField, 2, 3);
         mainLayout.add(shortestexpirydate, 1, 5);
         mainLayout.add(expiraryDatePane, 2, 5);
-        mainLayout.add(exist, 1, 8);
-        mainLayout.add(exitBox, 2, 8);
+        //mainLayout.add(exist, 1, 8);
+        //mainLayout.add(exitBox, 2, 8);
 
 
         Button doButton = new Button("확인");

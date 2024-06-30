@@ -17,11 +17,18 @@ import java.time.LocalDateTime;
 import java.util.LinkedList;
 
 public class StockAdd extends Application {
-    StockController stockController;
-    TableView stockTable;
+    private StockController stockController;
+    private TableView stockTable;
+    private String CODE;
     public StockAdd(StockController stockController, TableView stockTable) {
         this.stockController = stockController;
         this.stockTable = stockTable;
+        try {
+            //System.out.print(stockController.getNextCode());
+            this.CODE = stockController.getNextCode();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     LocalDateTime now;
@@ -61,8 +68,8 @@ public class StockAdd extends Application {
         minute = new Label("분");
         second = new Label("초");
         exist = new Label("재고 유무");
-
-        codeField = new TextField();
+        codeField = new TextField(this.CODE);
+        codeField.setDisable(true);
         nameField = new TextField();
 
         yearField = new TextField(now.getYear() + "");
@@ -71,8 +78,6 @@ public class StockAdd extends Application {
         hourField = new TextField(now.getHour() + "");
         minuteField = new TextField(now.getMinute() + "");
         secondField = new TextField(now.getSecond() + "");
-
-
 
         yearField.setMaxWidth(60);
         monthField.setMaxWidth(40);
@@ -95,13 +100,13 @@ public class StockAdd extends Application {
         expiraryDatePane.add(secondField, 10, 0);
         expiraryDatePane.add(second, 11, 0);
 
-        setNumericInputOnly(codeField);
-        setNumericInputOnly(yearField);
-        setNumericInputOnly(monthField);
-        setNumericInputOnly(dayField);
-        setNumericInputOnly(hourField);
-        setNumericInputOnly(minuteField);
-        setNumericInputOnly(secondField);
+        //setNumericInputOnly(codeField);
+//        setNumericInputOnly(yearField);
+//        setNumericInputOnly(monthField);
+//        setNumericInputOnly(dayField);
+//        setNumericInputOnly(hourField);
+//        setNumericInputOnly(minuteField);
+//        setNumericInputOnly(secondField);
 
         ChoiceBox exitBox = new ChoiceBox();
         exitBox.getItems().addAll("재고있음", "재고없음");
@@ -115,8 +120,8 @@ public class StockAdd extends Application {
         mainLayout.add(nameField, 2, 3);
         mainLayout.add(shortestexpirydate, 1, 5);
         mainLayout.add(expiraryDatePane, 2, 5);
-        mainLayout.add(exist, 1, 7);
-        mainLayout.add(exitBox, 2, 7);
+        //mainLayout.add(exist, 1, 7);
+        //mainLayout.add(exitBox, 2, 7);
 
 
         Button doButton = new Button("확인");
@@ -125,7 +130,7 @@ public class StockAdd extends Application {
         mainLayout.add(cancleButton, 4, 9);
 
         doButton.setOnAction(event ->{
-            Timestamp expiraryDate = Timestamp.valueOf(now.getYear() + "-" + (now.getMonthValue() + 1)+"-" + now.getDayOfMonth()
+            Timestamp expiraryDate = Timestamp.valueOf(now.getYear() + "-" + (now.getMonthValue())+"-" + now.getDayOfMonth()
                 + " " + now.getHour() + ":" + now.getMinute() + ":" + now.getSecond());
 
 

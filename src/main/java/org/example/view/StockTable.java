@@ -43,17 +43,17 @@ public class StockTable extends Application {
         TableColumn<Stock, String> codeCol = new TableColumn<>("코드번호");
         TableColumn<Stock, String> nameCol = new TableColumn<>("이름");
         TableColumn<Stock, String> shortestexpiryCol = new TableColumn<>("근접유통기한");
-        TableColumn<Stock, String> existCol = new TableColumn<>("재고 유무");
+        //TableColumn<Stock, String> existCol = new TableColumn<>("재고 유무");
 
         //각 속성들에 있는 변수들을 문자열로 변경
         codeCol.setCellValueFactory(new PropertyValueFactory<>("code"));
         nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
         //Timestamp는 propertyValueFactory로 속성 변형 불가능. 적절한 셀 값 팩토리를 직접 지정해야함
         shortestexpiryCol.setCellValueFactory(new PropertyValueFactory<>("shortestexpirydate"));
-        existCol.setCellValueFactory(new PropertyValueFactory<>("exist"));
+        //existCol.setCellValueFactory(new PropertyValueFactory<>("exist"));
 
 
-        stockTable.getColumns().addAll(codeCol, nameCol, shortestexpiryCol, existCol);
+        stockTable.getColumns().addAll(codeCol, nameCol, shortestexpiryCol/*, existCol*/);
 
 
         //처음, 전체 재고리스트 표시

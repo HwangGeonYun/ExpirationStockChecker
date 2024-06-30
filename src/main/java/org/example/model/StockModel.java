@@ -80,6 +80,27 @@ public class StockModel {
 
         return stockList;
     }
+
+    public int getLastCode() throws SQLException{
+
+
+        LinkedList<Stock> lists = search_all();
+
+        if(search_all().isEmpty()){
+            System.out.print("empty");
+            return 0;
+        }
+
+        System.out.print("hi");
+
+        return lists.stream()
+             .map(list->Integer
+             .valueOf(list.getCode()))
+             .sorted((o1, o2)-> o2 - o1)
+             .findFirst()
+             .orElse(0);
+    }
+
 //    public LinkedList<Stock> searchDatas(){
 //
 //    }
